@@ -1,4 +1,4 @@
-import pigpio
+"""Robot module"""
 
 MOTOR_L_FORWARD_PIN = 4
 MOTOR_L_BACKWARD_PIN = 27
