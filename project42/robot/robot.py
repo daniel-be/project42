@@ -24,7 +24,7 @@ class Robot:
         self.__set_motor_pins(1, 0, 1, 0)
         self.is_moving = True
 
-    def move_backward(self):
+    def move_backwards(self):
         """Moves the robot backwards."""
 
         self.__set_motor_pins(0, 1, 0, 1)
