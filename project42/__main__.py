@@ -1,5 +1,6 @@
 """Main module"""
 import sys
+from lib import robot
 
 def main(*args):
     """Main entry point of the application"""
