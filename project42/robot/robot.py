@@ -26,11 +26,11 @@ class Robot:
     def follow_line(self):
         """Follows the black line."""
 
-        if self.__pi.read(23) == 1 and self.__pi.read(24) == 1:
+        if self.__pi.read(L_IR_SENSOR) == 1 and self.__pi.read(R_IR_SENSOR) == 1:
             self.hold_position()
-        elif self.__pi.read(23) == 1:
+        elif self.__pi.read(L_IR_SENSOR) == 1:
             self.turn_left()
-        elif self.__pi.read(24) == 1:
+        elif self.__pi.read(R_IR_SENSOR) == 1:
             self.turn_right()
         else:
             self.move_forward()
