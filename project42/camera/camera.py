@@ -6,16 +6,30 @@ import argparse
 import imutils
 import cv2
 
-"""Animals"""
-TURTLE = Animal((29,86,6), (64, 255, 255), 15, "Circle")
+class Animal:
+    """animal class"""
+    def __init__(self, lowerColor, upperColor, minContourSize, contourType):
+        self.lowerColor = lowerColor
+        self.upperColor = upperColor
+        self.minContourSize = minContourSize
+        self.contourType = contourType
+
+TURTLE = Animal((87,43,26), (110, 40, 20), 15, "Circle")
 
 class Camera:
+    """Camera class"""
 
-    def __init__(self, showImage = False, frameWidth = 600):
-        self.camera = cv2.VideoCapture(0)
+    def __init__(self, showImage = False, frameWidth = 600, video = "none"):
+        if(video == "none"):
+            self.camera = cv2.VideoCapture(0)
+        else:
+            self.camera = cv2.VideoCapture(video, 0)
+        if not (self.camera.isOpened()):
+            print("camera not open")
         self.showImage = showImage
         self.frameWidth = frameWidth
-        self.calibrationIndex = 100 """used to modify colors based on surroundings??"""
+        #used to modify colors based on surroundings??
+        self.calibrationIndex = 100 
 
     def __exit__(self, exc_type, exc_value, traceback):
         camera.release()
@@ -23,20 +37,23 @@ class Camera:
 
     def search_animal(self, animal):
         found = False
-        while not found:
+        #while not found:
+        while True:
             found = self._check_current_frame(animal.lowerColor, animal.upperColor, animal.minContourSize, animal.contourType)
         #Event/Callback-Methode...
-         Return True   
+        return True
         
         
     def calibrate(self):
         self.calibrationIndex = 42
         
-    def _check_current_frame(self, lowerColor, upperColor, minContourSize, contourType, blur = FALSE):
+    def _check_current_frame(self, lowerColor, upperColor, minContourSize, contourType, blur = False):
+        found = False
         (grabbed, frame) = self.camera.read()
         if not grabbed:
             return False
         frame = imutils.resize(frame, self.frameWidth)
+
         if blur:
             frame = cv2.GaussianBlur(frame, (11,11),0)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -54,21 +71,23 @@ class Camera:
                 ((x,y), contourSize) = cv2.minEnclosingCircle(c)
                 M = cv2.moments(c)
                 center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-                
             elif contourType == "Rectangle":
-                """do something else"""
-
+                #do something else
+                print("Rectangle")
             if contourSize > minContourSize:
-                """sucessfully recognized"""
+                #sucessfully recognized
                 if self.showImage:
-                    """draw depending on contourType"""
+                    #draw depending on contourType
                     if contourType == "Circle":
-                        cv2.circle(frame, (int(x),int(y)), int(radius), (0, 255, 255),2)
+                        cv2.circle(frame, (int(x),int(y)), int(contourSize), (0, 255, 255),2)
                         cv2.circle(frame, center, 5, (0,0,255), -1)
                     elif contourType == "Rectangle":
-                        """draw Rectangle"""
-                    cv2.imshow("Frame", frame)
-                Return True
-
-        return False
+                        #draw Rectangle
+                        print("Rectangle again!")
+                found = True
+        if self.showImage:
+            cv2.imshow("frame", frame)
+            cv2.waitKey(10)
+        return found
     
+
