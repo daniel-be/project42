@@ -14,12 +14,16 @@ class Animal:
         self.minContourSize = minContourSize
         self.contourType = contourType
 
-TURTLE = Animal((87,43,26), (110, 40, 20), 15, "Circle")
+class Animals():
+    """no enum as base class to avoid having to use .value in selector"""
+    Frog = Animal((29, 100, 60), (64, 255, 255), 30, "Rectangle")
+    Tomato = Animal((0, 50, 50), (10, 255, 255), 20,"Circle")
+    Rhino = Animal((90, 50, 50), (130, 255, 255), 20, "Circle")
+    #Leopard = Animal((90, 50, 50), (130, 255, 255), 30, "Rectangle")
 
 class Camera:
     """Camera class"""
-
-    def __init__(self, showImage = False, frameWidth = 600, video = "none"):
+    def __init__(self, animal,showImage = False, frameWidth = 600, video = "none"):
         if(video == "none"):
             self.camera = cv2.VideoCapture(0)
         else:
@@ -28,18 +32,20 @@ class Camera:
             print("camera not open")
         self.showImage = showImage
         self.frameWidth = frameWidth
+        self.animal = animal
         #used to modify colors based on surroundings??
         self.calibrationIndex = 100 
+        
 
     def __exit__(self, exc_type, exc_value, traceback):
         camera.release()
         cv2.destroyAllWindows()
 
-    def search_animal(self, animal):
+    def search_animal(self):
         found = False
         #while not found:
         while True:
-            found = self._check_current_frame(animal.lowerColor, animal.upperColor, animal.minContourSize, animal.contourType)
+            found = self.check_current_frame()
         #Event/Callback-Methode...
         return True
         
@@ -47,7 +53,7 @@ class Camera:
     def calibrate(self):
         self.calibrationIndex = 42
         
-    def _check_current_frame(self, lowerColor, upperColor, minContourSize, contourType, blur = False):
+    def check_current_frame(self, blur = False):
         found = False
         (grabbed, frame) = self.camera.read()
         if not grabbed:
@@ -58,7 +64,7 @@ class Camera:
             frame = cv2.GaussianBlur(frame, (11,11),0)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        mask = cv2.inRange(hsv, lowerColor, upperColor)
+        mask = cv2.inRange(hsv, self.animal.lowerColor, self.animal.upperColor)
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
 
@@ -67,23 +73,23 @@ class Camera:
 
         if len(contours) > 0:
             c = max(contours, key=cv2.contourArea)
-            if contourType == "Circle":
+            if self.animal.contourType == "Circle":
                 ((x,y), contourSize) = cv2.minEnclosingCircle(c)
                 M = cv2.moments(c)
                 center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            elif contourType == "Rectangle":
-                #do something else
-                print("Rectangle")
-            if contourSize > minContourSize:
+            elif self.animal.contourType == "Rectangle":
+                rect = cv2.minAreaRect(c)
+                contourSize = rect[1][0] * rect[1][1] #width * height
+            if contourSize > self.animal.minContourSize:
                 #sucessfully recognized
                 if self.showImage:
-                    #draw depending on contourType
-                    if contourType == "Circle":
+                    if self.animal.contourType == "Circle":
                         cv2.circle(frame, (int(x),int(y)), int(contourSize), (0, 255, 255),2)
                         cv2.circle(frame, center, 5, (0,0,255), -1)
-                    elif contourType == "Rectangle":
-                        #draw Rectangle
-                        print("Rectangle again!")
+                    elif self.animal.contourType == "Rectangle":
+                        box = cv2.boxPoints(rect)
+                        box = np.int0(box)
+                        cv2.drawContours(frame,[box],0,(0,0,255),2)
                 found = True
         if self.showImage:
             cv2.imshow("frame", frame)
