@@ -5,6 +5,7 @@ import numpy as np
 import argparse
 import imutils
 import cv2
+import math
 
 class Animal:
     """animal class"""
@@ -23,7 +24,7 @@ class Animals():
 
 class Camera:
     """Camera class"""
-    def __init__(self, animal,showImage = False, frameWidth = 600, video = "none"):
+    def __init__(self, animal,showImage = False, frameWidth = 600, video = "none", tolerance_to_middle = 40):
         if(video == "none"):
             self.camera = cv2.VideoCapture(0)
         else:
@@ -33,6 +34,7 @@ class Camera:
         self.showImage = showImage
         self.frameWidth = frameWidth
         self.animal = animal
+        self.tolerance_to_middle = tolerance_to_middle
         #used to modify colors based on surroundings??
         self.calibrationIndex = 100 
         
@@ -80,7 +82,8 @@ class Camera:
             elif self.animal.contourType == "Rectangle":
                 rect = cv2.minAreaRect(c)
                 contourSize = rect[1][0] * rect[1][1] #width * height
-            if contourSize > self.animal.minContourSize:
+                center = (rect[0][0], rect[0][1])
+            if (contourSize > self.animal.minContourSize) and (math.fabs(center[0] - self.frameWidth / 2) < self.tolerance_to_middle):
                 #sucessfully recognized
                 if self.showImage:
                     if self.animal.contourType == "Circle":
