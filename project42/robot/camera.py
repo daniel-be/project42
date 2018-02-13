@@ -57,7 +57,7 @@ class Camera:
             frame = cv2.GaussianBlur(frame, (11, 11), 0)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        mask = cv2.inRange(hsv, self.animal.lowerColor, self.animal.upperColor)
+        mask = cv2.inRange(hsv, self.animal.lower_color, self.animal.upper_color)
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
 

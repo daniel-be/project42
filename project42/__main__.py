@@ -3,7 +3,7 @@ import sys
 import imutils
 #import pigpio
 import robot.robot as r
-import camera.camera as Camera
+import robot.camera as Camera
 
 
 
@@ -11,7 +11,8 @@ def main(*args):
     """Main entry point of the application"""
 
     cam = Camera.Camera(Camera.Animals.Frog, True, 600, "./test-video1.mp4")
-    cam.search_animal()
+    while True:
+        cam.check_current_frame()
 
     print(args)
     robo = r.Robot(pigpio.pi())
