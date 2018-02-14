@@ -47,6 +47,8 @@ class Robot:
     def follow_line(self):
         """Initializes the interrupts to follow the black line."""
 
+        self.__pi.callback(L_IR_SENSOR, 0, self.__l_ir_interrupt)
+        self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
         self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
         self.__pi.callback(R_IR_SENSOR, 1, self.__r_ir_interrupt)
 
