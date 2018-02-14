@@ -100,3 +100,9 @@ class Robot:
             self.__move_grab(0, 1)
 
         self.__move_grab(0, 0)
+
+    def grab(self):
+        """Grabs the animal by moving out and in the grab."""
+
+        self.move_grab_out()
+        self.move_grab_in()
