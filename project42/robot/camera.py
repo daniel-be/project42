@@ -5,21 +5,6 @@ import numpy as np
 import imutils
 import cv2
 
-class Animal:
-    """Represents an animal."""
-    def __init__(self, lower_color, upper_color, min_contour_size, contour_type):
-        self.lower_color = lower_color
-        self.upper_color = upper_color
-        self.min_contour_size = min_contour_size
-        self.contour_type = contour_type
-
-class Animals():
-    """no enum as base class to avoid having to use .value in selector"""
-    Frog = Animal((29, 100, 60), (64, 255, 255), 30, "Rectangle")
-    Tomato = Animal((0, 50, 50), (10, 255, 255), 20, "Circle")
-    Rhino = Animal((90, 50, 50), (130, 255, 255), 20, "Circle")
-    #Leopard = Animal((90, 50, 50), (130, 255, 255), 30, "Rectangle")
-
 class Camera:
     """Represents the camera."""
     def __init__(self, animal, show_image=False, frame_width=600,
