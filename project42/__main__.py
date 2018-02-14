@@ -13,11 +13,13 @@ def main(*args):
 
     cam = c.Camera(a.Animals.Frog, True, 600, "./test-video1.mp4")
     robo = r.Robot(pigpio.pi())
+    grabbed = False
 
     while robo.follow_line():
-        grabbed = False
-        
+
         if cam.check_current_frame() and not grabbed:
+            robo.hold_position()
+            robo.grab()
             grabbed = True
 
     return
