@@ -1,5 +1,7 @@
 """Robot module"""
 
+import time
+
 MOTOR_L_FORWARD_PIN = 12
 MOTOR_L_BACKWARD_PIN = 16
 MOTOR_R_FORWARD_PIN = 20
@@ -71,20 +73,30 @@ class Robot:
 
         if level == 0:
             self.move_forward()
+            self.l_ir_sensor_val = 0
             self.is_moving = True
         elif level == 1:
-            self.__move(0, 1, 1, 0)
-            self.is_moving = True
+            if self.r_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.__move(0, 1, 1, 0)
+                self.l_ir_sensor_val = 1
+                self.is_moving = True
 
     def __r_ir_interrupt(self, gpio, level, tick):
         """Turns the robot right."""
 
         if level == 0:
             self.move_forward()
+            self.r_ir_sensor_val = 0
             self.is_moving = True
         elif level == 1:
-            self.__move(1, 0, 0, 1)
-            self.is_moving = True
+            if self.l_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.__move(1, 0, 0, 1)
+                self.r_ir_sensor_val = 1
+                self.is_moving = True
 
     def move_grab_in(self):
         """Moves the grab in."""
@@ -107,3 +119,8 @@ class Robot:
 
         self.move_grab_out()
         self.move_grab_in()
+
+    def unload_animal(self):
+        self.move_backwards()
+        time.sleep(2)
+        self.hold_position()
