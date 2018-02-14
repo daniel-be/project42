@@ -2,7 +2,7 @@
 import sys
 import imutils
 import time
-#import pigpio
+import pigpio
 import robot.robot as r
 import robot.camera as c
 import robot.animal as a
