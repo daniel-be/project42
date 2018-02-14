@@ -1,5 +1,4 @@
 """Robot module"""
-
 import time
 
 MOTOR_L_FORWARD_PIN = 12
@@ -24,6 +23,7 @@ class Robot:
         self.is_moving = False
         self.l_ir_sensor_val = 0
         self.r_ir_sensor_val = 0
+        self.done = False
 
     def __set_pwm(self, pin, val, speed):
         """Sets the GPIO pins using PWM."""
@@ -123,6 +123,10 @@ class Robot:
         self.move_grab_in()
 
     def unload_animal(self):
+        """Unloads the animal."""
+
+        # remove callbacks
         self.move_backwards()
         time.sleep(2)
         self.hold_position()
+        self.done = True

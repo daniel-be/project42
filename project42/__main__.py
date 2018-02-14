@@ -1,12 +1,11 @@
 """Main module"""
 import sys
 import imutils
+import time
 #import pigpio
 import robot.robot as r
 import robot.camera as c
 import robot.animal as a
-
-
 
 def main(*args):
     """Main entry point of the application"""
@@ -15,12 +14,15 @@ def main(*args):
     robo = r.Robot(pigpio.pi())
     grabbed = False
 
-    while robo.follow_line():
+    robo.follow_line()
+    robo.move_forward()
 
+    while not robo.done:
         if cam.check_current_frame() and not grabbed:
             robo.hold_position()
             robo.grab()
             grabbed = True
+            robo.move_forward()
 
     return
 
