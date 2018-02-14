@@ -45,12 +45,15 @@ class Robot:
 
         if self.__pi.read(L_IR_SENSOR) == 1 and self.__pi.read(R_IR_SENSOR) == 1:
             self.hold_position()
+            return False
         elif self.__pi.read(L_IR_SENSOR) == 1:
             self.turn_left()
         elif self.__pi.read(R_IR_SENSOR) == 1:
             self.turn_right()
         else:
             self.move_forward()
+
+        return True
 
     def move_forward(self):
         """Moves the robot forward."""
