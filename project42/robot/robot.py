@@ -1,5 +1,7 @@
 """Robot module"""
 
+import time
+
 MOTOR_L_FORWARD_PIN = 12
 MOTOR_L_BACKWARD_PIN = 16
 MOTOR_R_FORWARD_PIN = 20
@@ -20,6 +22,8 @@ class Robot:
     def __init__(self, pi):
         self.__pi = pi
         self.is_moving = False
+        self.l_ir_sensor_val = 0
+        self.r_ir_sensor_val = 0
 
     def __set_pwm(self, pin, val, speed):
         """Sets the GPIO pins using PWM."""
@@ -41,19 +45,12 @@ class Robot:
         self.__set_pwm(MOTOR_GRAB_OUT, grab_out, GRAB_SPEED)
 
     def follow_line(self):
-        """Follows the black line."""
+        """Initializes the interrupts to follow the black line."""
 
-        if self.__pi.read(L_IR_SENSOR) == 1 and self.__pi.read(R_IR_SENSOR) == 1:
-            self.hold_position()
-            return False
-        elif self.__pi.read(L_IR_SENSOR) == 1:
-            self.turn_left()
-        elif self.__pi.read(R_IR_SENSOR) == 1:
-            self.turn_right()
-        else:
-            self.move_forward()
-
-        return True
+        self.__pi.callback(L_IR_SENSOR, 0, self.__l_ir_interrupt)
+        self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
+        self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
+        self.__pi.callback(R_IR_SENSOR, 1, self.__r_ir_interrupt)
 
     def move_forward(self):
         """Moves the robot forward."""
@@ -73,17 +70,35 @@ class Robot:
         self.__move(0, 0, 0, 0)
         self.is_moving = False
 
-    def turn_left(self):
+    def __l_ir_interrupt(self, gpio, level, tick):
         """Turns the robot left."""
 
-        self.__move(0, 1, 1, 0)
-        self.is_moving = True
+        if level == 0:
+            self.move_forward()
+            self.l_ir_sensor_val = 0
+            self.is_moving = True
+        elif level == 1:
+            if self.r_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.__move(0, 1, 1, 0)
+                self.l_ir_sensor_val = 1
+                self.is_moving = True
 
-    def turn_right(self):
+    def __r_ir_interrupt(self, gpio, level, tick):
         """Turns the robot right."""
 
-        self.__move(1, 0, 0, 1)
-        self.is_moving = True
+        if level == 0:
+            self.move_forward()
+            self.r_ir_sensor_val = 0
+            self.is_moving = True
+        elif level == 1:
+            if self.l_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.__move(1, 0, 0, 1)
+                self.r_ir_sensor_val = 1
+                self.is_moving = True
 
     def move_grab_in(self):
         """Moves the grab in."""
@@ -106,3 +121,8 @@ class Robot:
 
         self.move_grab_out()
         self.move_grab_in()
+
+    def unload_animal(self):
+        self.move_backwards()
+        time.sleep(2)
+        self.hold_position()
