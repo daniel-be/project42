@@ -8,7 +8,7 @@ import cv2
 class Camera:
     """Represents the camera."""
     def __init__(self, animal, show_image=False, frame_width=600,
-                 video="none", tolerance_to_middle=40):
+                 video="none"):
         if video == "none":
             self.camera = cv2.VideoCapture(0)
         else:
@@ -18,7 +18,6 @@ class Camera:
         self.show_image = show_image
         self.frame_width = frame_width
         self.animal = animal
-        self.tolerance_to_middle = tolerance_to_middle
         #used to modify colors based on surroundings??
         self.calibration_index = 100
 
@@ -60,7 +59,7 @@ class Camera:
                 contour_size = rect[1][0] * rect[1][1] #width * height
                 center = (rect[0][0], rect[0][1])
             if (contour_size > self.animal.min_contour_size and
-                    math.fabs(center[0] - self.frame_width / 2) < self.tolerance_to_middle):
+                    math.fabs(center[0] - self.frame_width / 2) < self.animal.tolerance_to_middle):
                 #sucessfully recognized
                 if self.show_image:
                     if self.animal.contour_type == "Circle":
