@@ -11,9 +11,6 @@ GRAB_IN_SENSOR = 6
 GRAB_OUT_SENSOR = 13
 L_IR_SENSOR = 23
 R_IR_SENSOR = 24
-# Value between 0 and 255 -> dutycycle = 255 / SPEED
-MOTOR_SPEED = 64
-GRAB_SPEED = 64
 
 class Robot:
     """Represents the robot."""
@@ -24,25 +21,38 @@ class Robot:
         self.l_ir_sensor_val = 0
         self.r_ir_sensor_val = 0
         self.done = False
+        # Value between 0 and 255 -> dutycycle = 255 / SPEED
+        self.MOTOR_SPEED = 64
+        self.GRAB_SPEED = 64
 
     def __set_pwm(self, pin, val, speed):
         """Sets the GPIO pins using PWM."""
 
         self.__pi.set_PWM_dutycycle(pin, val * speed)
 
-    def __move(self, l_forward, l_back, r_forward, r_back):
+    def __move(self, l_forward, l_back, r_forward, r_back, l_speed_factor = 1, r_speed_factor = 1):
         """Sets the pins to move the robot in a direction."""
 
-        self.__set_pwm(MOTOR_L_FORWARD_PIN, l_forward, MOTOR_SPEED)
-        self.__set_pwm(MOTOR_L_BACKWARD_PIN, l_back, MOTOR_SPEED)
-        self.__set_pwm(MOTOR_R_FORWARD_PIN, r_forward, MOTOR_SPEED)
-        self.__set_pwm(MOTOR_R_BACKWARD_PIN, r_back, MOTOR_SPEED)
+        self.__set_pwm(MOTOR_L_FORWARD_PIN, l_forward, self.MOTOR_SPEED * l_speed_factor)
+        self.__set_pwm(MOTOR_L_BACKWARD_PIN, l_back, self.MOTOR_SPEED * l_speed_factor)
+        self.__set_pwm(MOTOR_R_FORWARD_PIN, r_forward, self.MOTOR_SPEED * r_speed_factor)
+        self.__set_pwm(MOTOR_R_BACKWARD_PIN, r_back, self.MOTOR_SPEED * r_speed_factor)
 
     def __move_grab(self, grab_in, grab_out):
         """Sets the pins to move the grab in or out."""
 
-        self.__set_pwm(MOTOR_GRAB_IN, grab_in, GRAB_SPEED)
-        self.__set_pwm(MOTOR_GRAB_OUT, grab_out, GRAB_SPEED)
+        self.__set_pwm(MOTOR_GRAB_IN, grab_in, self.GRAB_SPEED)
+        self.__set_pwm(MOTOR_GRAB_OUT, grab_out, self.GRAB_SPEED)
+
+    def set_motor_speed(self, speed):
+        """Sets the motor speed."""
+
+        self.MOTOR_SPEED = speed
+
+    def set_grab_speed(self, speed):
+        """Sets the grab speed."""
+
+        self.GRAB_SPEED = speed
 
     def follow_line(self):
         """Initializes the interrupts to follow the black line."""
@@ -70,6 +80,30 @@ class Robot:
         self.__move(0, 0, 0, 0)
         self.is_moving = False
 
+    def turn_right(self):
+        """Turns the robot right."""
+
+        self.__move(1, 0, 0, 1)
+        self.is_moving = True
+
+    def move_right(self):
+        """Moves the robot right."""
+
+        self.__move(1, 0, 0, 1, 1, 0.6)
+        self.is_moving = True
+
+    def turn_left(self):
+        """Turns the robot left."""
+
+        self.__move(0, 1, 1, 0)
+        self.is_moving = True
+
+    def move_left(self):
+        """Moves the robot left."""
+
+        self.__move(0, 1, 1, 0, 0.6)
+        self.is_moving = True
+
     def __l_ir_interrupt(self, gpio, level, tick):
         """Turns the robot left."""
 
@@ -81,7 +115,7 @@ class Robot:
             if self.r_ir_sensor_val == 1:
                 self.unload_animal()
             else:
-                self.__move(0, 1, 1, 0)
+                self.move_left()
                 self.l_ir_sensor_val = 1
                 self.is_moving = True
 
@@ -96,24 +130,28 @@ class Robot:
             if self.l_ir_sensor_val == 1:
                 self.unload_animal()
             else:
-                self.__move(1, 0, 0, 1)
+                self.move_right()
                 self.r_ir_sensor_val = 1
                 self.is_moving = True
 
     def move_grab_in(self):
         """Moves the grab in."""
 
-        while self.__pi.read(GRAB_IN_SENSOR) != 1:
-            self.__move_grab(1, 0)
-
+        """while self.__pi.read(GRAB_IN_SENSOR) != 1:
+            self.__move_grab(1, 0)"""
+        
+        self.__move_grab(1, 0)
+        time.sleep(2)
         self.__move_grab(0, 0)
 
     def move_grab_out(self):
         """Moves the grab out."""
 
-        while self.__pi.read(GRAB_OUT_SENSOR) != 1:
-            self.__move_grab(0, 1)
+        """while self.__pi.read(GRAB_OUT_SENSOR) != 1:
+            self.__move_grab(0, 1)"""
 
+        self.__move_grab(0, 1)
+        time.sleep(2)
         self.__move_grab(0, 0)
 
     def grab(self):
@@ -125,8 +163,7 @@ class Robot:
     def unload_animal(self):
         """Unloads the animal."""
 
-        # remove callbacks
-        self.move_backwards()
+        self.turn_left()
         time.sleep(2)
         self.hold_position()
         self.done = True
