@@ -38,6 +38,36 @@ class Robot:
         self.__set_pwm(MOTOR_R_FORWARD_PIN, r_forward, self.MOTOR_SPEED * r_speed_factor)
         self.__set_pwm(MOTOR_R_BACKWARD_PIN, r_back, self.MOTOR_SPEED * r_speed_factor)
 
+    def __l_ir_interrupt(self, gpio, level, tick):
+        """Turns the robot left."""
+
+        if level == 0:
+            self.move_forward()
+            self.l_ir_sensor_val = 0
+            self.is_moving = True
+        elif level == 1:
+            if self.r_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.move_left()
+                self.l_ir_sensor_val = 1
+                self.is_moving = True
+
+    def __r_ir_interrupt(self, gpio, level, tick):
+        """Turns the robot right."""
+
+        if level == 0:
+            self.move_forward()
+            self.r_ir_sensor_val = 0
+            self.is_moving = True
+        elif level == 1:
+            if self.l_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.move_right()
+                self.r_ir_sensor_val = 1
+                self.is_moving = True
+
     def __move_grab(self, grab_in, grab_out):
         """Sets the pins to move the grab in or out."""
 
@@ -103,36 +133,6 @@ class Robot:
 
         self.__move(0, 1, 1, 0, 0.6)
         self.is_moving = True
-
-    def __l_ir_interrupt(self, gpio, level, tick):
-        """Turns the robot left."""
-
-        if level == 0:
-            self.move_forward()
-            self.l_ir_sensor_val = 0
-            self.is_moving = True
-        elif level == 1:
-            if self.r_ir_sensor_val == 1:
-                self.unload_animal()
-            else:
-                self.move_left()
-                self.l_ir_sensor_val = 1
-                self.is_moving = True
-
-    def __r_ir_interrupt(self, gpio, level, tick):
-        """Turns the robot right."""
-
-        if level == 0:
-            self.move_forward()
-            self.r_ir_sensor_val = 0
-            self.is_moving = True
-        elif level == 1:
-            if self.l_ir_sensor_val == 1:
-                self.unload_animal()
-            else:
-                self.move_right()
-                self.r_ir_sensor_val = 1
-                self.is_moving = True
 
     def move_grab_in(self):
         """Moves the grab in."""
