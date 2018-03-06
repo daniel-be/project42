@@ -1,17 +1,17 @@
 """Robot module"""
 import time
 
-MOTOR_L_FORWARD_PIN = 12
-MOTOR_L_BACKWARD_PIN = 13
-MOTOR_R_FORWARD_PIN = 18
-MOTOR_R_BACKWARD_PIN = 19
+MOTOR_L_FORWARD_PIN = 16
+MOTOR_L_BACKWARD_PIN = 20
+MOTOR_R_FORWARD_PIN = 21
+MOTOR_R_BACKWARD_PIN = 26
 MOTOR_GRAB_IN = 5
 MOTOR_GRAB_OUT = 6
-GRAB_IN_SENSOR = 27
-GRAB_OUT_SENSOR = 22
+GRAB_IN_SENSOR = 12
+GRAB_OUT_SENSOR = 13
 L_IR_SENSOR = 23
 R_IR_SENSOR = 24
-PWM_FREQUENCY = 30000
+PWM_FREQUENCY = 40000
 
 class Robot:
     """Represents the robot."""
@@ -22,23 +22,43 @@ class Robot:
         self.l_ir_sensor_val = 0
         self.r_ir_sensor_val = 0
         self.done = False
+        # Value between 0 and 255 -> dutycycle = 255 / SPEED
+        self.MOTOR_SPEED = 150
         # Value between 0 and 1000000 -> dutycycle = 1000000 / SPEED
-        self.MOTOR_SPEED = 300000
         self.GRAB_SPEED = 100000
+        self.init_pwm()
 
-    def __set_hardware_pwm(self, pin, val, speed):
+    def init_pwm(self):
+        """Initializes the PWM on GPIO pins."""
+
+        self.__pi.set_PWM_frequency(MOTOR_L_FORWARD_PIN, PWM_FREQUENCY)
+        self.__pi.set_PWM_frequency(MOTOR_L_BACKWARD_PIN, PWM_FREQUENCY)
+        self.__pi.set_PWM_frequency(MOTOR_R_FORWARD_PIN, PWM_FREQUENCY)
+        self.__pi.set_PWM_frequency(MOTOR_R_BACKWARD_PIN, PWM_FREQUENCY)
+
+    def __set_pwm(self, pin, val, speed):
         """Sets the GPIO pins using PWM."""
 
-        print("GPIO{} | VALUE {}".format(pin, val))
+        self.__pi.set_PWM_dutycycle(pin, val * speed)
+
+    def __set_hardware_pwm(self, pin, val, speed):
+        """Sets the GPIO pins using hardware PWM."""
+
         self.__pi.hardware_PWM(pin, PWM_FREQUENCY, val * speed)
 
     def __move(self, l_forward, l_back, r_forward, r_back, l_speed_factor = 1, r_speed_factor = 1):
         """Sets the pins to move the robot in a direction."""
 
-        self.__set_hardware_pwm(MOTOR_L_FORWARD_PIN, l_forward, self.MOTOR_SPEED * l_speed_factor)
-        self.__set_hardware_pwm(MOTOR_L_BACKWARD_PIN, l_back, self.MOTOR_SPEED * l_speed_factor)
-        self.__set_hardware_pwm(MOTOR_R_FORWARD_PIN, r_forward, self.MOTOR_SPEED * r_speed_factor)
-        self.__set_hardware_pwm(MOTOR_R_BACKWARD_PIN, r_back, self.MOTOR_SPEED * r_speed_factor)
+        self.__set_pwm(MOTOR_L_FORWARD_PIN, l_forward, self.MOTOR_SPEED * l_speed_factor)
+        self.__set_pwm(MOTOR_L_BACKWARD_PIN, l_back, self.MOTOR_SPEED * l_speed_factor)
+        self.__set_pwm(MOTOR_R_FORWARD_PIN, r_forward, self.MOTOR_SPEED * r_speed_factor)
+        self.__set_pwm(MOTOR_R_BACKWARD_PIN, r_back, self.MOTOR_SPEED * r_speed_factor)
+
+    def __move_grab(self, grab_in, grab_out):
+        """Sets the pins to move the grab in or out."""
+
+        self.__set_hardware_pwm(MOTOR_GRAB_IN, grab_in, self.GRAB_SPEED)
+        self.__set_hardware_pwm(MOTOR_GRAB_OUT, grab_out, self.GRAB_SPEED)
 
     def __l_ir_interrupt(self, gpio, level, tick):
         """Turns the robot left."""
@@ -72,17 +92,11 @@ class Robot:
                 self.r_ir_sensor_val = 1
                 self.is_moving = True
 
-    def __move_grab(self, grab_in, grab_out):
-        """Sets the pins to move the grab in or out."""
-
-        self.__set_hardware_pwm(MOTOR_GRAB_IN, grab_in, self.GRAB_SPEED)
-        self.__set_hardware_pwm(MOTOR_GRAB_OUT, grab_out, self.GRAB_SPEED)
-
     def set_motor_speed(self, speed):
         """Sets the motor speed."""
 
-        if speed > 1000000 or speed < 0:
-            raise ValueError("Motor speed must be between 0 and 1000000.")
+        if speed > 255 or speed < 0:
+            raise ValueError("Motor speed must be between 0 and 255.")
 
         self.MOTOR_SPEED = speed
 
