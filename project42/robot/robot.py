@@ -43,7 +43,7 @@ class Robot:
         """Turns the robot left."""
 
         print("Interrupt! GPIO: {} LEVEL: {} TICK: {}".format(gpio, level, tick))
-        if level == 0:
+        """if level == 0:
             self.move_forward()
             self.l_ir_sensor_val = 0
             self.is_moving = True
@@ -53,13 +53,13 @@ class Robot:
             else:
                 self.turn_left()
                 self.l_ir_sensor_val = 1
-                self.is_moving = True
+                self.is_moving = True"""
 
     def __r_ir_interrupt(self, gpio, level, tick):
         """Turns the robot right."""
 
         print("Interrupt! GPIO: {} LEVEL: {} TICK: {}".format(gpio, level, tick))
-        if level == 0:
+        """if level == 0:
             self.move_forward()
             self.r_ir_sensor_val = 0
             self.is_moving = True
@@ -69,7 +69,7 @@ class Robot:
             else:
                 self.turn_right()
                 self.r_ir_sensor_val = 1
-                self.is_moving = True
+                self.is_moving = True"""
 
     def __move_grab(self, grab_in, grab_out):
         """Sets the pins to move the grab in or out."""
