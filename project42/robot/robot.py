@@ -187,7 +187,5 @@ class Robot:
     def unload_animal(self):
         """Unloads the animal."""
 
-        self.turn_left()
-        time.sleep(2)
         self.hold_position()
         self.done = True
