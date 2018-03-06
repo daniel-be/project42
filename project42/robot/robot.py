@@ -29,6 +29,7 @@ class Robot:
     def __set_hardware_pwm(self, pin, val, speed):
         """Sets the GPIO pins using PWM."""
 
+        print("GPIO{} | VALUE {}".format(pin, val))
         self.__pi.hardware_PWM(pin, PWM_FREQUENCY, val * speed)
 
     def __move(self, l_forward, l_back, r_forward, r_back, l_speed_factor = 1, r_speed_factor = 1):
