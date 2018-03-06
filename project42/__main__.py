@@ -11,10 +11,7 @@ def main(*args):
     """Main entry point of the application"""
 
     cam = c.Camera(a.Animals.Turtle, True, 600, "../test-video1.mp4")
-    while True:
-        cam.check_current_frame()
-
-    ''' robo = r.Robot(pigpio.pi())
+    robo = r.Robot(pigpio.pi())
     grabbed = False
 
     robo.follow_line()
@@ -26,7 +23,7 @@ def main(*args):
             robo.grab()
             grabbed = True
             robo.move_forward()
- '''
+            
     return
 
 if __name__ == "__main__":
