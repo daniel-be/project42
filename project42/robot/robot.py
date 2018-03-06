@@ -51,7 +51,7 @@ class Robot:
             if self.r_ir_sensor_val == 1:
                 self.unload_animal()
             else:
-                self.move_left()
+                self.turn_left()
                 self.l_ir_sensor_val = 1
                 self.is_moving = True
 
@@ -67,7 +67,7 @@ class Robot:
             if self.l_ir_sensor_val == 1:
                 self.unload_animal()
             else:
-                self.move_right()
+                self.turn_right()
                 self.r_ir_sensor_val = 1
                 self.is_moving = True
 
