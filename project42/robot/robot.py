@@ -5,10 +5,10 @@ MOTOR_L_FORWARD_PIN = 16
 MOTOR_L_BACKWARD_PIN = 20
 MOTOR_R_FORWARD_PIN = 21
 MOTOR_R_BACKWARD_PIN = 26
-MOTOR_GRAB_IN = 5
-MOTOR_GRAB_OUT = 6
-GRAB_IN_SENSOR = 12
-GRAB_OUT_SENSOR = 13
+MOTOR_GRAB_IN = 12
+MOTOR_GRAB_OUT = 13
+GRAB_IN_SENSOR = 5
+GRAB_OUT_SENSOR = 6
 L_IR_SENSOR = 23
 R_IR_SENSOR = 24
 PWM_FREQUENCY = 40000
@@ -22,11 +22,17 @@ class Robot:
         self.l_ir_sensor_val = 0
         self.r_ir_sensor_val = 0
         self.done = False
-        # Value between 0 and 255 -> dutycycle = 255 / SPEED
+
+        # Init PWM
         self.MOTOR_SPEED = 150
-        # Value between 0 and 1000000 -> dutycycle = 1000000 / SPEED
         self.GRAB_SPEED = 100000
         self.init_pwm()
+
+        # Init IR sensors
+        self.init_ir_sensors()
+
+        # Init grab sensors
+        self.init_grab_sensors()
 
     def init_pwm(self):
         """Initializes the PWM on GPIO pins."""
@@ -35,6 +41,60 @@ class Robot:
         self.__pi.set_PWM_frequency(MOTOR_L_BACKWARD_PIN, PWM_FREQUENCY)
         self.__pi.set_PWM_frequency(MOTOR_R_FORWARD_PIN, PWM_FREQUENCY)
         self.__pi.set_PWM_frequency(MOTOR_R_BACKWARD_PIN, PWM_FREQUENCY)
+
+    def init_ir_sensors(self):
+        """Initializes the interrupts to follow the black line."""
+
+        self.__pi.callback(L_IR_SENSOR, 0, self.__l_ir_interrupt)
+        self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
+        self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
+        self.__pi.callback(R_IR_SENSOR, 1, self.__r_ir_interrupt)
+
+    def init_grab_sensors(self):
+        """Initializes the interrupts to move the grab in and out."""
+
+        self.__pi.callback(GRAB_IN_SENSOR, 1, self.__grab_in_interrupt)
+        self.__pi.callback(GRAB_OUT_SENSOR, 1, self.__grab_out_interrupt)
+
+    def __l_ir_interrupt(self, gpio, level, tick):
+        """Turns the robot left."""
+
+        if level == 0:
+            self.move_forward()
+            self.l_ir_sensor_val = 0
+            self.is_moving = True
+        elif level == 1:
+            if self.r_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.turn_left()
+                self.l_ir_sensor_val = 1
+                self.is_moving = True
+
+    def __r_ir_interrupt(self, gpio, level, tick):
+        """Turns the robot right."""
+
+        if level == 0:
+            self.move_forward()
+            self.r_ir_sensor_val = 0
+            self.is_moving = True
+        elif level == 1:
+            if self.l_ir_sensor_val == 1:
+                self.unload_animal()
+            else:
+                self.turn_right()
+                self.r_ir_sensor_val = 1
+                self.is_moving = True
+
+    def __grab_in_interrupt(self, gpio, level, tick):
+        """Stops the movement of the grab."""
+
+        self.__move_grab(0, 0)
+
+    def __grab_out_interrupt(self, gpio, level, tick):
+        """Moves the grab in."""
+
+        self.__move_grab(1, 0)
 
     def __set_pwm(self, pin, val, speed):
         """Sets the GPIO pins using PWM."""
@@ -60,38 +120,6 @@ class Robot:
         self.__set_hardware_pwm(MOTOR_GRAB_IN, grab_in, self.GRAB_SPEED)
         self.__set_hardware_pwm(MOTOR_GRAB_OUT, grab_out, self.GRAB_SPEED)
 
-    def __l_ir_interrupt(self, gpio, level, tick):
-        """Turns the robot left."""
-
-        print("Interrupt! GPIO: {} LEVEL: {} TICK: {}".format(gpio, level, tick))
-        if level == 0:
-            self.move_forward()
-            self.l_ir_sensor_val = 0
-            self.is_moving = True
-        elif level == 1:
-            if self.r_ir_sensor_val == 1:
-                self.unload_animal()
-            else:
-                self.turn_left()
-                self.l_ir_sensor_val = 1
-                self.is_moving = True
-
-    def __r_ir_interrupt(self, gpio, level, tick):
-        """Turns the robot right."""
-
-        print("Interrupt! GPIO: {} LEVEL: {} TICK: {}".format(gpio, level, tick))
-        if level == 0:
-            self.move_forward()
-            self.r_ir_sensor_val = 0
-            self.is_moving = True
-        elif level == 1:
-            if self.l_ir_sensor_val == 1:
-                self.unload_animal()
-            else:
-                self.turn_right()
-                self.r_ir_sensor_val = 1
-                self.is_moving = True
-
     def set_motor_speed(self, speed):
         """Sets the motor speed."""
 
@@ -107,14 +135,6 @@ class Robot:
             raise ValueError("Grab speed must be between 0 and 1000000.")
 
         self.GRAB_SPEED = speed
-
-    def follow_line(self):
-        """Initializes the interrupts to follow the black line."""
-
-        self.__pi.callback(L_IR_SENSOR, 0, self.__l_ir_interrupt)
-        self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
-        self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
-        self.__pi.callback(R_IR_SENSOR, 1, self.__r_ir_interrupt)
 
     def move_forward(self):
         """Moves the robot forward."""
@@ -158,31 +178,10 @@ class Robot:
         self.__move(0, 1, 1, 0, 0.6)
         self.is_moving = True
 
-    def move_grab_in(self):
-        """Moves the grab in."""
-
-        """while self.__pi.read(GRAB_IN_SENSOR) != 1:
-            self.__move_grab(1, 0)"""
-        
-        self.__move_grab(1, 0)
-        time.sleep(2)
-        self.__move_grab(0, 0)
-
-    def move_grab_out(self):
-        """Moves the grab out."""
-
-        """while self.__pi.read(GRAB_OUT_SENSOR) != 1:
-            self.__move_grab(0, 1)"""
-
-        self.__move_grab(0, 1)
-        time.sleep(2)
-        self.__move_grab(0, 0)
-
     def grab(self):
         """Grabs the animal by moving out and in the grab."""
 
-        self.move_grab_out()
-        self.move_grab_in()
+        self.__move_grab(0, 1)
 
     def unload_animal(self):
         """Unloads the animal."""
