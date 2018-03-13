@@ -117,8 +117,8 @@ class Robot:
     def __move_grab(self, grab_in, grab_out):
         """Sets the pins to move the grab in or out."""
 
-        self.__set_hardware_pwm(MOTOR_GRAB_IN, grab_in, self.GRAB_SPEED)
-        self.__set_hardware_pwm(MOTOR_GRAB_OUT, grab_out, self.GRAB_SPEED)
+        self.__set_hardware_pwm(MOTOR_GRAB_IN, PWM_FREQUENCY, grab_in * self.GRAB_SPEED)
+        self.__set_hardware_pwm(MOTOR_GRAB_OUT, PWM_FREQUENCY, grab_out * self.GRAB_SPEED)
 
     def set_motor_speed(self, speed):
         """Sets the motor speed."""
