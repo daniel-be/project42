@@ -89,11 +89,14 @@ class Robot:
     def __grab_in_interrupt(self, gpio, level, tick):
         """Stops the movement of the grab."""
 
+        self.__pi.callback(GRAB_IN_SENSOR, 1, None)
         self.__move_grab(0, 0)
 
     def __grab_out_interrupt(self, gpio, level, tick):
         """Moves the grab in."""
 
+        self.__pi.callback(GRAB_IN_SENSOR, 1, self.__grab_in_interrupt)
+        self.__pi.callback(GRAB_OUT_SENSOR, 1, None)
         self.__move_grab(1, 0)
 
     def __set_pwm(self, pin, val, speed):
@@ -181,6 +184,7 @@ class Robot:
     def grab(self):
         """Grabs the animal by moving out and in the grab."""
 
+        self.__pi.callback(GRAB_OUT_SENSOR, 1, self.__grab_out_interrupt)
         self.__move_grab(0, 1)
 
     def unload_animal(self):
