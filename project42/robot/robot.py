@@ -31,9 +31,6 @@ class Robot:
         # Init IR sensors
         self.init_ir_sensors()
 
-        # Init grab sensors
-        self.init_grab_sensors()
-
     def init_pwm(self):
         """Initializes the PWM on GPIO pins."""
 
@@ -49,12 +46,6 @@ class Robot:
         self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
         self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
         self.__pi.callback(R_IR_SENSOR, 1, self.__r_ir_interrupt)
-
-    def init_grab_sensors(self):
-        """Initializes the interrupts to move the grab in and out."""
-
-        self.__pi.callback(GRAB_IN_SENSOR, 1, self.__grab_in_interrupt)
-        self.__pi.callback(GRAB_OUT_SENSOR, 1, self.__grab_out_interrupt)
 
     def __l_ir_interrupt(self, gpio, level, tick):
         """Turns the robot left."""
@@ -85,19 +76,6 @@ class Robot:
                 self.turn_right()
                 self.r_ir_sensor_val = 1
                 self.is_moving = True
-
-    def __grab_in_interrupt(self, gpio, level, tick):
-        """Stops the movement of the grab."""
-
-        self.__pi.callback(GRAB_IN_SENSOR, 1, None)
-        self.__move_grab(0, 0)
-
-    def __grab_out_interrupt(self, gpio, level, tick):
-        """Moves the grab in."""
-
-        self.__pi.callback(GRAB_IN_SENSOR, 1, self.__grab_in_interrupt)
-        self.__pi.callback(GRAB_OUT_SENSOR, 1, None)
-        self.__move_grab(1, 0)
 
     def __set_pwm(self, pin, val, speed):
         """Sets the GPIO pins using PWM."""
@@ -181,11 +159,27 @@ class Robot:
         self.__move(0, 1, 1, 0, 0.6)
         self.is_moving = True
 
+    def move_grab_in(self):
+        """Moves the grab in."""
+
+        while self.__pi.read(GRAB_IN_SENSOR) != 1:
+            self.__move_grab(1, 0)
+
+        self.__move_grab(0, 0)
+
+    def move_grab_out(self):
+        """Moves the grab out."""
+
+        while self.__pi.read(GRAB_OUT_SENSOR) != 1:
+            self.__move_grab(0, 1)
+
+        self.__move_grab(0, 0)
+
     def grab(self):
         """Grabs the animal by moving out and in the grab."""
 
-        self.__pi.callback(GRAB_OUT_SENSOR, 1, self.__grab_out_interrupt)
-        self.__move_grab(0, 1)
+        self.move_grab_out()
+        self.move_grab_in()
 
     def unload_animal(self):
         """Unloads the animal."""
