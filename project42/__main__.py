@@ -53,7 +53,8 @@ def main(*args):
             except IOError:
                 print("Bluetooth connection was closed.")
     except:
-        print("Error!")
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
 
 if __name__ == "__main__":
     main(*sys.argv[1:])
