@@ -8,3 +8,6 @@ class Animal:
         self.min_contour_size = config_data[6]
         self.contour_type = config_data[7]
         self.tolerance_to_middle = config_data[8]
+
+    def __str__(self):
+        return str(self.__class__) + ": " + str(self.__dict__)
