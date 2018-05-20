@@ -15,4 +15,4 @@ class Animal:
         return str(self.__class__) + ": " + str(self.__dict__)
 
     def __byte_to_int(self, byte):
-        return struct.unpack("<i", byte + "\x00\x00\x00")
+        return struct.unpack("<i", byte + "\x00\x00\x00")[0]
