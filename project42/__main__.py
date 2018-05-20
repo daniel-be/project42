@@ -34,7 +34,8 @@ def main(*args):
             try:
                 while True:
                     data = client_sock.recv(1024)
-                    print(data)
+                    animal = a.Animal(data)
+                    print(animal)
                     '''
                     cam = c.Camera(a.Animal(data), True, 600, "../test-video1.mp4")
                     grabbed = False
