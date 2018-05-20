@@ -5,6 +5,9 @@ import numpy as np
 import imutils
 import cv2
 
+CONTOUR_TYPE_RECTANGLE = 114
+CONTOUR_TYPE_CIRCLE = 99
+
 class Camera:
     """Represents the camera."""
     def __init__(self, animal, show_image=False, frame_width=600,
@@ -50,11 +53,11 @@ class Camera:
 
         if contours:
             c = max(contours, key=cv2.contourArea)
-            if self.animal.contour_type == "Circle":
+            if self.animal.contour_type == CONTOUR_TYPE_CIRCLE:
                 ((x, y), contour_size) = cv2.minEnclosingCircle(c)
                 m = cv2.moments(c)
                 center = (int(m["m10"] / m["m00"]), int(m["m01"] / m["m00"]))
-            elif self.animal.contour_type == "Rectangle":
+            elif self.animal.contour_type == CONTOUR_TYPE_RECTANGLE:
                 rect = cv2.minAreaRect(c)
                 contour_size = rect[1][0] * rect[1][1] #width * height
                 center = (rect[0][0], rect[0][1])
@@ -62,10 +65,10 @@ class Camera:
                     math.fabs(center[0] - self.frame_width / 2) < self.animal.tolerance_to_middle):
                 #sucessfully recognized
                 if self.show_image:
-                    if self.animal.contour_type == "Circle":
+                    if self.animal.contour_type == CONTOUR_TYPE_CIRCLE:
                         cv2.circle(frame, (int(x), int(y)), int(contour_size), (0, 255, 255), 2)
                         cv2.circle(frame, center, 5, (0, 0, 255), -1)
-                    elif self.animal.contour_type == "Rectangle":
+                    elif self.animal.contour_type == CONTOUR_TYPE_RECTANGLE:
                         box = cv2.boxPoints(rect)
                         box = np.int0(box)
                         cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
