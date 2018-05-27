@@ -50,8 +50,8 @@ class Robot:
     def __init_grab_sensors(self):
         """Sets the pull down resistors for the grab sensors."""
 
-        self.__pi.set_pull_up_down(L_IR_SENSOR, 1)
-        self.__pi.set_pull_up_down(R_IR_SENSOR, 1)
+        self.__pi.set_pull_up_down(GRAB_IN_SENSOR, 1)
+        self.__pi.set_pull_up_down(GRAB_OUT_SENSOR, 1)
 
     def __destroy_ir_sensors(self):
         """Removes the interrupts for following the line."""
