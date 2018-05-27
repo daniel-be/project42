@@ -68,8 +68,6 @@ class Robot:
     def __init_ir_sensors(self):
         """Initializes the interrupts to follow the black line."""
 
-        self.__pi.set_pull_up_down(L_IR_SENSOR, 1)
-        self.__pi.set_pull_up_down(R_IR_SENSOR, 1)
         self.l_ir_low_callback = self.__pi.callback(L_IR_SENSOR, 0, self.__l_ir_interrupt)
         self.r_ir_low_callback = self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
         self.l_ir_high_callback = self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
