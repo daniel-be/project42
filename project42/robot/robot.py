@@ -21,6 +21,10 @@ class Robot:
         self.is_moving = False
         self.l_ir_sensor_val = 0
         self.r_ir_sensor_val = 0
+        self.l_ir_low_callback = None
+        self.r_ir_low_callback = None
+        self.l_ir_high_callback = None
+        self.r_ir_high_callback = None
         self.done = False
 
         # Init PWM
@@ -39,13 +43,28 @@ class Robot:
         self.__pi.set_PWM_frequency(MOTOR_R_FORWARD_PIN, PWM_FREQUENCY)
         self.__pi.set_PWM_frequency(MOTOR_R_BACKWARD_PIN, PWM_FREQUENCY)
 
+    def destroy_ir_sensors(self):
+        """Removes the interrupts for following the line."""
+
+        self.__destory_callback(self.l_ir_low_callback)
+        self.__destory_callback(self.r_ir_low_callback)
+        self.__destory_callback(self.l_ir_high_callback)
+        self.__destory_callback(self.r_ir_high_callback)
+
+    def __destory_callback(self, cb):
+        if cb is not None:
+            cb.cancel()
+
     def init_ir_sensors(self):
         """Initializes the interrupts to follow the black line."""
 
-        self.__pi.callback(L_IR_SENSOR, 0, self.__l_ir_interrupt)
-        self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
-        self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
-        self.__pi.callback(R_IR_SENSOR, 1, self.__r_ir_interrupt)
+        self.__pi.set_pull_up_down(L_IR_SENSOR, 1)
+        self.__pi.set_pull_up_down(R_IR_SENSOR, 1)
+        self.l_ir_low_callback = self.__pi.callback(L_IR_SENSOR, 0, self.__l_ir_interrupt)
+        self.r_ir_low_callback = self.__pi.callback(R_IR_SENSOR, 0, self.__r_ir_interrupt)
+        self.l_ir_high_callback = self.__pi.callback(L_IR_SENSOR, 1, self.__l_ir_interrupt)
+        self.r_ir_high_callback = self.__pi.callback(R_IR_SENSOR, 1, self.__r_ir_interrupt)
+
 
     def __l_ir_interrupt(self, gpio, level, tick):
         """Turns the robot left."""
