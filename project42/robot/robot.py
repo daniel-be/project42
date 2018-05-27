@@ -78,12 +78,12 @@ class Robot:
     def __l_ir_interrupt(self, gpio, level, tick):
         """Turns the robot left."""
 
-        print("l")
         if level == 0:
             self.move_forward()
             self.l_ir_sensor_val = 0
             self.is_moving = True
         elif level == 1:
+            print("l")
             if self.r_ir_sensor_val == 1:
                 self.unload_animal()
             else:
@@ -93,13 +93,13 @@ class Robot:
 
     def __r_ir_interrupt(self, gpio, level, tick):
         """Turns the robot right."""
-
-        print("r")
+ 
         if level == 0:
             self.move_forward()
             self.r_ir_sensor_val = 0
             self.is_moving = True
         elif level == 1:
+            print("r")
             if self.l_ir_sensor_val == 1:
                 self.unload_animal()
             else:
