@@ -56,6 +56,7 @@ class Robot:
     def __destroy_ir_sensors(self):
         """Removes the interrupts for following the line."""
 
+        print("destroy")
         self.__destory_callback(self.l_ir_low_callback)
         self.__destory_callback(self.r_ir_low_callback)
         self.__destory_callback(self.l_ir_high_callback)
@@ -77,6 +78,7 @@ class Robot:
     def __l_ir_interrupt(self, gpio, level, tick):
         """Turns the robot left."""
 
+        print("l")
         if level == 0:
             self.move_forward()
             self.l_ir_sensor_val = 0
@@ -92,6 +94,7 @@ class Robot:
     def __r_ir_interrupt(self, gpio, level, tick):
         """Turns the robot right."""
 
+        print("r")
         if level == 0:
             self.move_forward()
             self.r_ir_sensor_val = 0
