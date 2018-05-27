@@ -30,12 +30,15 @@ class Robot:
         # Init PWM
         self.MOTOR_SPEED = 150
         self.GRAB_SPEED = 100000
-        self.init_pwm()
+        self.__init_pwm()
 
         # Init IR sensors
-        self.init_ir_sensors()
+        self.__init_ir_sensors()
 
-    def init_pwm(self):
+        # Init grab sensors
+        self.__init_grab_sensors()
+
+    def __init_pwm(self):
         """Initializes the PWM on GPIO pins."""
 
         self.__pi.set_PWM_frequency(MOTOR_L_FORWARD_PIN, PWM_FREQUENCY)
@@ -43,7 +46,13 @@ class Robot:
         self.__pi.set_PWM_frequency(MOTOR_R_FORWARD_PIN, PWM_FREQUENCY)
         self.__pi.set_PWM_frequency(MOTOR_R_BACKWARD_PIN, PWM_FREQUENCY)
 
-    def destroy_ir_sensors(self):
+    def __init_grab_sensors(self):
+        """Sets the pull down resistors for the grab sensors."""
+
+        self.__pi.set_pull_up_down(L_IR_SENSOR, 1)
+        self.__pi.set_pull_up_down(R_IR_SENSOR, 1)
+
+    def __destroy_ir_sensors(self):
         """Removes the interrupts for following the line."""
 
         self.__destory_callback(self.l_ir_low_callback)
@@ -55,7 +64,7 @@ class Robot:
         if cb is not None:
             cb.cancel()
 
-    def init_ir_sensors(self):
+    def __init_ir_sensors(self):
         """Initializes the interrupts to follow the black line."""
 
         self.__pi.set_pull_up_down(L_IR_SENSOR, 1)
@@ -205,3 +214,8 @@ class Robot:
 
         self.hold_position()
         self.done = True
+
+    def destroy(self):
+        """Clears the IR sensors."""
+
+        self.__destroy_ir_sensors()
