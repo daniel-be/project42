@@ -24,7 +24,7 @@ def main(*args):
                     service_classes = [ uuid, SERIAL_PORT_CLASS ],
                     profiles = [ SERIAL_PORT_PROFILE ])
 
-    robo = r.Robot(pigpio.pi())
+    pi = pigpio.pi()
 
     try:
         while True:
@@ -36,20 +36,28 @@ def main(*args):
                     data = client_sock.recv(1024)
                     animal = a.Animal(data)
                     print(animal)
-                    '''
-                    cam = c.Camera(a.Animal(data), True, 600, "../test-video1.mp4")
-                    grabbed = False
 
+                    cam = c.Camera(a.Animal(data), True, 600)
+                    robo = r.Robot(pi)
+                    client_sock.send("Started. Searching animal ...")
                     robo.move_forward()
 
                     while not robo.done:
-                        if cam.check_current_frame() and not grabbed:
+                        if cam.check_current_frame() and not robo.grabbed:
                             robo.hold_position()
+                            client_sock.send("Animal found. Grabbing ...")
                             robo.grab()
-                            grabbed = True
+                            client_sock.send("Grabbed animal. Moving to target area and unloading animal ...")
                             robo.move_forward()
-                            
-                    '''
+
+                    res = ""
+                    if robo.grabbed: 
+                        res = "Done."
+                    else:
+                        res = "Animal not found. Done."
+
+                    client_sock.send(res)
+
             except IOError:
                 print("Bluetooth connection was closed.")
     except:

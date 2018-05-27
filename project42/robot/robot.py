@@ -25,6 +25,7 @@ class Robot:
         self.r_ir_low_callback = None
         self.l_ir_high_callback = None
         self.r_ir_high_callback = None
+        self.grabbed = False
         self.done = False
 
         # Init PWM
@@ -208,14 +209,18 @@ class Robot:
 
         self.move_grab_out()
         self.move_grab_in()
+        self.grabbed = True
 
     def unload_animal(self):
         """Unloads the animal."""
 
         self.hold_position()
-        self.done = True
-
-    def destroy(self):
-        """Clears the IR sensors."""
-
         self.__destroy_ir_sensors()
+        self.move_forward()
+        time.sleep(1)
+        self.hold_position()
+        self.move_grab_out()
+        self.move_forward()
+        time.sleep(2)
+        self.hold_position()
+        self.done = True
