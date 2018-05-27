@@ -37,17 +37,17 @@ def main(*args):
                     animal = a.Animal(data)
                     print(animal)
 
-                    cam = c.Camera(a.Animal(data), True, 600)
+                    cam = c.Camera(a.Animal(data), False, 600)
                     robo = r.Robot(pi)
-                    #client_sock.send("Started. Searching animal ...")
+                    client_sock.send("Started. Searching animal ...")
                     robo.move_forward()
 
                     while not robo.done:
                         if cam.check_current_frame() and not robo.grabbed:
                             robo.hold_position()
-                            #client_sock.send("Animal found. Grabbing ...")
+                            client_sock.send("Animal found. Grabbing ...")
                             robo.grab()
-                            #client_sock.send("Grabbed animal. Moving to target area and unloading animal ...")
+                            client_sock.send("Grabbed animal. Moving to target area and unloading animal ...")
                             robo.move_forward()
 
                     res = ""
@@ -56,7 +56,7 @@ def main(*args):
                     else:
                         res = "Animal not found. Done."
 
-                    #client_sock.send(res)
+                    client_sock.send(res)
 
             except IOError:
                 print("Bluetooth connection was closed.")
