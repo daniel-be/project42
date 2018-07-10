@@ -1,0 +1,18 @@
+Rhino:
+	Min(47,51,37)
+	Max(126,255,255)
+Tomato:
+	Min(138,72,0)
+	Max(241,255,255)
+Leopard:
+	Min(0,114,52)
+	Max(23,227,248)
+	contour_size = ~48 beim gefundenen (Circle) --> 38
+Frog:
+	Min(30,65,0)
+	Max(91,255,77)
+	contour_size = ~50 beim gefundenen (Circle) --> > 40
+Turtle:
+	Min(0,37,124)
+	Max(14,72,197)
+
