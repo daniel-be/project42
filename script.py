@@ -39,7 +39,7 @@ def get_arguments():
                     action='store_true')
     args = vars(ap.parse_args())
 
-    args['image'] = "Turtle.PNG"
+    args['image'] = "Frog.JPG"
     args['filter'] = "HSV"
     if not xor(bool(args['image']), bool(args['webcam'])):
         ap.error("Please specify only one image source")

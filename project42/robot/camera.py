@@ -4,6 +4,7 @@ import math
 import numpy as np
 import imutils
 import cv2
+from imutils.video import VideoStream
 
 CONTOUR_TYPE_RECTANGLE = 114
 CONTOUR_TYPE_CIRCLE = 99
@@ -13,11 +14,10 @@ class Camera:
     def __init__(self, animal, show_image=False, frame_width=600,
                  video="none"):
         if video == "none":
-            self.camera = cv2.VideoCapture(0)
+            self.camera = VideoStream(0, True, (320, 240))
         else:
-            self.camera = cv2.VideoCapture(video, 0)
-        if not self.camera.isOpened():
-            print("camera not open")
+            self.camera = VideoStream(video)
+        self.camera.start()
         self.show_image = show_image
         self.frame_width = frame_width
         self.animal = animal
@@ -25,7 +25,7 @@ class Camera:
         self.calibration_index = 100
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.camera.release()
+        self.camera.stop()
         cv2.destroyAllWindows()
 
     def calibrate(self):
@@ -35,10 +35,11 @@ class Camera:
     def check_current_frame(self, blur=False):
         """Checks the current frame for the animal."""
         found = False
-        (grabbed, frame) = self.camera.read()
-        if not grabbed:
+        frame = self.camera.read()
+        if frame is None:
             return False
-        frame = imutils.resize(frame, self.frame_width)
+         #   return False
+        #frame = imutils.resize(frame, self.frame_width)
 
         if blur:
             frame = cv2.GaussianBlur(frame, (11, 11), 0)
@@ -75,5 +76,5 @@ class Camera:
                 found = True
         if self.show_image:
             cv2.imshow("frame", frame)
-            cv2.waitKey(10)
+            cv2.waitKey(1)
         return found

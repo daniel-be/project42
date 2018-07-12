@@ -13,10 +13,10 @@ def main(*args):
     RHINO = a.Animal((47,51,37),(126,255,255), 0, 99, 57)
     TOMATO = a.Animal((138,72,0),(241,255,255), 0, 99, 50)
     LEOPARD = a.Animal((0,114,52),(23,227,248), 38, 99, 50)
-    FROG = a.Animal((30,65,0),(91,255,77), 40, 99, 50)
+    FROG = a.Animal((30,65,0),(91,255,77), 60, 99, 50)
     TURTLE = a.Animal((0,37,124),(14,72,197), 15, 99, 50)
 
-    cam = c.Camera(TURTLE, True, 600, 'C:\\Users\\Sven\\Documents\\Programmieren\\Video2.mp4' )
+    cam = c.Camera(TOMATO, True, 600, 'C:\\Users\\sven\\Videos\\video5.mp4')
     found = False
     try:
         while not found:
