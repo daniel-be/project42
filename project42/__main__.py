@@ -35,7 +35,7 @@ def main(*args):
                 while True:
                     data = client_sock.recv(1024)
                     animal = a.Animal(data)
-                    cam = c.Camera(animal, False, 600)
+                    cam = c.Camera(animal, False)
                     robo = r.Robot(pi)
                     hsv_string = "L" + animal.lower_color + "H" + animal.upper_color
                     client_sock.send("Started. Searching animal (" + hsv_string + ") ...")
