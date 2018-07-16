@@ -20,6 +20,7 @@ class Camera:
         self.camera.start()
         self.show_image = show_image
         self.animal = animal
+        self.frame_width = 320
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.camera.stop()
