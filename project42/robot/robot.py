@@ -29,7 +29,8 @@ class Robot:
         self.done = False
 
         # Init PWM
-        self.MOTOR_SPEED = 150
+        self.L_MOTOR_SPEED = 133
+        self.R_MOTOR_SPEED = 130
         self.GRAB_SPEED = 500000
         self.__init_pwm()
 
@@ -119,10 +120,10 @@ class Robot:
     def __move(self, l_forward, l_back, r_forward, r_back, l_speed_factor = 1, r_speed_factor = 1):
         """Sets the pins to move the robot in a direction."""
 
-        self.__set_pwm(MOTOR_L_FORWARD_PIN, l_forward, self.MOTOR_SPEED * l_speed_factor)
-        self.__set_pwm(MOTOR_L_BACKWARD_PIN, l_back, self.MOTOR_SPEED * l_speed_factor)
-        self.__set_pwm(MOTOR_R_FORWARD_PIN, r_forward, self.MOTOR_SPEED * r_speed_factor)
-        self.__set_pwm(MOTOR_R_BACKWARD_PIN, r_back, self.MOTOR_SPEED * r_speed_factor)
+        self.__set_pwm(MOTOR_L_FORWARD_PIN, l_forward, self.L_MOTOR_SPEED * l_speed_factor)
+        self.__set_pwm(MOTOR_L_BACKWARD_PIN, l_back, self.L_MOTOR_SPEED * l_speed_factor)
+        self.__set_pwm(MOTOR_R_FORWARD_PIN, r_forward, self.R_MOTOR_SPEED * r_speed_factor)
+        self.__set_pwm(MOTOR_R_BACKWARD_PIN, r_back, self.R_MOTOR_SPEED * r_speed_factor)
 
     def __move_grab(self, grab_in, grab_out):
         """Sets the pins to move the grab in or out."""
@@ -130,13 +131,21 @@ class Robot:
         self.__set_hardware_pwm(MOTOR_GRAB_IN, grab_in, self.GRAB_SPEED)
         self.__set_hardware_pwm(MOTOR_GRAB_OUT, grab_out, self.GRAB_SPEED)
 
-    def set_motor_speed(self, speed):
-        """Sets the motor speed."""
+    def set_l_motor_speed(self, speed):
+        """Sets the motor speed of the left motor."""
 
         if speed > 255 or speed < 0:
             raise ValueError("Motor speed must be between 0 and 255.")
 
-        self.MOTOR_SPEED = speed
+        self.L_MOTOR_SPEED = speed
+
+    def set_r_motor_speed(self, speed):
+        """Sets the motor speed of the right motor."""
+
+        if speed > 255 or speed < 0:
+            raise ValueError("Motor speed must be between 0 and 255.")
+
+        self.R_MOTOR_SPEED = speed
 
     def set_grab_speed(self, speed):
         """Sets the grab speed."""
