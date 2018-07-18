@@ -29,7 +29,7 @@ class Robot:
         self.done = False
 
         # Init PWM
-        self.MOTOR_SPEED = 120
+        self.MOTOR_SPEED = 150
         self.GRAB_SPEED = 500000
         self.__init_pwm()
 
