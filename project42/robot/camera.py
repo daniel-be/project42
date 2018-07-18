@@ -68,5 +68,5 @@ class Camera:
                 found = True
         if self.show_image:
             cv2.imshow("frame", frame)
-            cv2.waitKey(10)
+            cv2.waitKey(1)
         return found
