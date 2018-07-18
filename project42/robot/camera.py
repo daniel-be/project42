@@ -11,7 +11,7 @@ CONTOUR_TYPE_CIRCLE = 99
 
 class Camera:
     """Represents the camera."""
-    def __init__(self, animal, show_image=False, video="none"):
+    def __init__(self, show_image=False, video="none"):
         if video == "none":
             self.camera = VideoStream(0, True)
         else:
@@ -19,12 +19,14 @@ class Camera:
         
         self.camera.start()
         self.show_image = show_image
-        self.animal = animal
         self.frame_width = 320
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.camera.stop()
         cv2.destroyAllWindows()
+
+    def set_animal(self, animal):
+        self.animal = animal
 
     def check_current_frame(self, blur=False):
         """Checks the current frame for the animal."""

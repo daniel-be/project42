@@ -11,22 +11,23 @@ from bluetooth import *
 def main(*args):
     """Main entry point of the application"""
 
-    server_sock=BluetoothSocket( RFCOMM )
-    server_sock.bind(("",PORT_ANY))
-    server_sock.listen(1)
-
-    port = server_sock.getsockname()[1]
-
-    uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
-
-    advertise_service( server_sock, "MarvinServer",
-                    service_id = uuid,
-                    service_classes = [ uuid, SERIAL_PORT_CLASS ],
-                    profiles = [ SERIAL_PORT_PROFILE ])
-
-    pi = pigpio.pi()
-
     try:
+        server_sock=BluetoothSocket( RFCOMM )
+        server_sock.bind(("",PORT_ANY))
+        server_sock.listen(1)
+
+        port = server_sock.getsockname()[1]
+
+        uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
+
+        advertise_service( server_sock, "MarvinServer",
+                        service_id = uuid,
+                        service_classes = [ uuid, SERIAL_PORT_CLASS ],
+                        profiles = [ SERIAL_PORT_PROFILE ])
+
+        pi = pigpio.pi()
+        cam = c.Camera()
+
         while True:
             client_sock, client_info = server_sock.accept()
             print("Accepted connection from ", client_info)
@@ -35,7 +36,7 @@ def main(*args):
                 while True:
                     data = client_sock.recv(1024)
                     animal = a.Animal(data)
-                    cam = c.Camera(animal, False)
+                    cam.set_animal(animal)
                     robo = r.Robot(pi)
                     hsv_string = "L(H" + str(animal.lower_color[0]) + "|S" + str(animal.lower_color[1]) + "|V" + str(animal.lower_color[2]) + ") H(H" + str(animal.upper_color[0]) + "|S" + str(animal.upper_color[1]) + "|V" + str(animal.upper_color[2]) + ")"
                     client_sock.send("Started. Searching animal (" + hsv_string + ") ...")
