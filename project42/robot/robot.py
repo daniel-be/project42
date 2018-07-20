@@ -29,13 +29,13 @@ class Robot:
         self.done = False
 
         # Init PWM
-        self.L_MOTOR_SPEED = 133
-        self.R_MOTOR_SPEED = 130
+        self.L_MOTOR_SPEED = 135
+        self.R_MOTOR_SPEED = self.L_MOTOR_SPEED * 0.95
         self.GRAB_SPEED = 500000
         self.__init_pwm()
 
-        # Init IR sensors
-        self.__init_ir_sensors()
+	# Init line sensors
+	self.__init_ir_sensors()	
 
         # Init grab sensors
         self.__init_grab_sensors()
@@ -170,6 +170,7 @@ class Robot:
     def hold_position(self):
         """Stops the movement of the robot."""
 
+	self.__destroy_ir_sensors()
         self.__move(0, 0, 0, 0)
         self.is_moving = False
 
@@ -182,7 +183,7 @@ class Robot:
     def move_right(self):
         """Moves the robot right."""
 
-        self.__move(1, 0, 0, 1, 1, 0.6)
+        self.__move(0, 0, 0, 1, 1, 1)
         self.is_moving = True
 
     def turn_left(self):
@@ -194,7 +195,7 @@ class Robot:
     def move_left(self):
         """Moves the robot left."""
 
-        self.__move(0, 1, 1, 0, 0.6)
+        self.__move(0, 1, 0, 0, 1, 1)
         self.is_moving = True
 
     def move_grab_in(self):
@@ -219,12 +220,12 @@ class Robot:
         self.move_grab_out()
         self.move_grab_in()
         self.grabbed = True
+	self.__init_ir_sensors()
 
     def unload_animal(self):
         """Unloads the animal."""
 
         self.hold_position()
-        self.__destroy_ir_sensors()
         self.move_forward()
         time.sleep(2)
         self.hold_position()
