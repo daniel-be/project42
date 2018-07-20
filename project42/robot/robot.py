@@ -34,8 +34,8 @@ class Robot:
         self.GRAB_SPEED = 500000
         self.__init_pwm()
 
-	# Init line sensors
-	self.__init_ir_sensors()	
+	    # Init line sensors
+	    self.__init_ir_sensors()	
 
         # Init grab sensors
         self.__init_grab_sensors()
