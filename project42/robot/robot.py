@@ -35,7 +35,7 @@ class Robot:
         self.__init_pwm()
 
 	    # Init line sensors
-	    self.__init_ir_sensors()	
+        self.__init_ir_sensors()	
 
         # Init grab sensors
         self.__init_grab_sensors()
@@ -155,6 +155,16 @@ class Robot:
 
         self.GRAB_SPEED = speed
 
+    def start_movement(self):
+        """Corrects the position and starts the movement."""
+
+        if self.__pi.read(L_IR_SENSOR) == 1:
+            self.move_left()
+        elif self.__pi.read(R_IR_SENSOR) == 1:
+            self.move_right()
+        else:
+            self.move_forward()
+
     def move_forward(self):
         """Moves the robot forward."""
 
@@ -170,7 +180,7 @@ class Robot:
     def hold_position(self):
         """Stops the movement of the robot."""
 
-	self.__destroy_ir_sensors()
+        self.__destroy_ir_sensors()
         self.__move(0, 0, 0, 0)
         self.is_moving = False
 
@@ -220,7 +230,7 @@ class Robot:
         self.move_grab_out()
         self.move_grab_in()
         self.grabbed = True
-	self.__init_ir_sensors()
+        self.__init_ir_sensors()
 
     def unload_animal(self):
         """Unloads the animal."""

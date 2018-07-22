@@ -40,7 +40,7 @@ def main(*args):
                     robo = r.Robot(pi)
                     hsv_string = "L(H" + str(animal.lower_color[0]) + "|S" + str(animal.lower_color[1]) + "|V" + str(animal.lower_color[2]) + ") H(H" + str(animal.upper_color[0]) + "|S" + str(animal.upper_color[1]) + "|V" + str(animal.upper_color[2]) + ")"
                     client_sock.send("Started. Searching animal (" + hsv_string + ") ...")
-                    robo.move_forward()
+                    robo.start_movement()
 
                     while not robo.done:
                         if cam.check_current_frame() and not robo.grabbed:
@@ -48,7 +48,7 @@ def main(*args):
                             client_sock.send("Animal found. Grabbing ...")
                             robo.grab()
                             client_sock.send("Grabbed animal. Moving to target area and unloading animal ...")
-                            robo.move_forward()
+                            robo.start_movement()
 
                     res = ""
                     if robo.grabbed: 
